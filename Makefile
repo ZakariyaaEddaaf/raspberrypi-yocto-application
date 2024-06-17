@@ -8,23 +8,28 @@ RELEASEFLAGS = -O3 -DNDEBUG
 # Directories
 UTILSDIR = utils
 GNSSDIR = global-positioning-system
+TCPDIR = transmission-control-protocol
 
 # Source files
 SRCS_UTILS = $(UTILSDIR)/serial.cpp
 SRCS_GPS = $(GNSSDIR)/gnss.cpp
+SRCS_TCP = $(TCPDIR)/server.cpp
 SRCS_MAIN = main.cpp
 
 # Header files
 HEADERS_UTILS = $(wildcard $(UTILSDIR)/*.hpp)
 HEADERS_GPS = $(wildcard $(GNSSDIR)/*.hpp)
+HEADERS_TCP = $(wildcard $(TCPDIR)/*.hpp)
+
 
 # Object files
 OBJS_UTILS = $(SRCS_UTILS:.cpp=.o)
 OBJS_GPS = $(SRCS_GPS:.cpp=.o)
+OBJS_TCP = $(SRCS_TCP:.cpp=.o)
 OBJ_MAIN = $(SRCS_MAIN:.cpp=.o)
 
 # Executable
-TARGET = gps_server
+TARGET = gnss_server
 
 # Default target
 all: release
@@ -38,15 +43,15 @@ release: CXXFLAGS += $(RELEASEFLAGS)
 release: $(TARGET)
 
 # Linking
-$(TARGET): $(OBJS_UTILS) $(OBJS_GPS) $(OBJ_MAIN)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS_UTILS) $(OBJS_GPS) $(OBJ_MAIN)
+$(TARGET): $(OBJS_UTILS) $(OBJS_GPS) $(OBJS_TCP) $(OBJ_MAIN)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS_UTILS) $(OBJS_GPS) $(OBJS_TCP) $(OBJ_MAIN)
 
 # Compile source files into object files
-%.o: %.cpp $(HEADERS_UTILS) $(HEADERS_GPS)
+%.o: %.cpp $(HEADERS_UTILS) $(HEADERS_GPS) $(HEADERS_TCP)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean target
 clean:
-	rm -f $(OBJS_UTILS) $(OBJS_GPS) $(OBJ_MAIN) $(TARGET)
+	rm -f $(OBJS_UTILS) $(OBJS_GPS) $(OBJ_MAIN) $(OBJS_TCP) $(TARGET)
 
 .PHONY: all debug release clean
