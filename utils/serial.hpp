@@ -17,6 +17,7 @@ public:
 
     bool open_serial();
     bool close_serial();
+    bool configure_serial();
     ssize_t read_serial(char* buffer, size_t size);
     ssize_t write_serial(const char* data, size_t size);
 
@@ -24,7 +25,6 @@ private:
     int serial_fd;
     uint32_t baud_rate;
     std::string serial_port;
-    bool configure_serial();
 };
 
 #endif // SERIAL_HPP
