@@ -1,9 +1,13 @@
 # Compiler
 CXX = g++
+
 # Compiler flags
 CXXFLAGS = -Wall -std=c++11
 DEBUGFLAGS = -g -Og
 RELEASEFLAGS = -O3 -DNDEBUG
+
+# Linker flags
+LDFLAGS = -pthread
 
 # Directories
 UTILSDIR = utils
@@ -15,12 +19,6 @@ SRCS_UTILS = $(UTILSDIR)/serial.cpp
 SRCS_GPS = $(GNSSDIR)/gnss.cpp
 SRCS_TCP = $(TCPDIR)/server.cpp
 SRCS_MAIN = main.cpp
-
-# Header files
-HEADERS_UTILS = $(wildcard $(UTILSDIR)/*.hpp)
-HEADERS_GPS = $(wildcard $(GNSSDIR)/*.hpp)
-HEADERS_TCP = $(wildcard $(TCPDIR)/*.hpp)
-
 
 # Object files
 OBJS_UTILS = $(SRCS_UTILS:.cpp=.o)
@@ -44,10 +42,10 @@ release: $(TARGET)
 
 # Linking
 $(TARGET): $(OBJS_UTILS) $(OBJS_GPS) $(OBJS_TCP) $(OBJ_MAIN)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS_UTILS) $(OBJS_GPS) $(OBJS_TCP) $(OBJ_MAIN)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS_UTILS) $(OBJS_GPS) $(OBJS_TCP) $(OBJ_MAIN) $(LDFLAGS)
 
 # Compile source files into object files
-%.o: %.cpp $(HEADERS_UTILS) $(HEADERS_GPS) $(HEADERS_TCP)
+%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean target
