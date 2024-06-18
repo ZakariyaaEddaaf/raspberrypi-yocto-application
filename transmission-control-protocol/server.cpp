@@ -38,19 +38,23 @@ bool Server::start_server()
             continue;
         }
 
-        std::cout << "Client connected"<< std::endl;
+        // Log client address
+        char client_ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
+        std::cout << "Client connected from " << client_ip << ":" << ntohs(client_addr.sin_port) << std::endl;
 
-        while (true)
-        {
-            if (!transmit_gnss(client_socket))
+        std::thread([this, client_socket, client_ip]() {
+            while (true)
             {
-                std::cerr << "Failed to send data to client. Closing connection." << std::endl;
-                break;
+                if (!transmit_gnss(client_socket))
+                {
+                    std::cerr << "Failed to send data to client. Closing connection." << std::endl;
+                    break;
+                }
             }
-        }
-
-        close(client_socket);
-        std::cout << "Client disconnected" << std::endl;
+            close(client_socket);
+            std::cout << "Client disconnected from " << client_ip << std::endl;
+        }).detach();
     }
 
     return true;
@@ -122,9 +126,9 @@ bool Server::transmit_gnss(int client_socket)
 
     std::string gpgga_sentence = gnss.catch_gpgga_gngga(gps_data);
     gpgga_sentence += "\n";
-    if (!gpgga_sentence.empty()){
-        
-        int bytes_sent = send(client_socket, gpgga_sentence.c_str(), gpgga_sentence.length(), 0);
+    if (!gpgga_sentence.empty())
+    {
+        ssize_t bytes_sent = send(client_socket, gpgga_sentence.c_str(), gpgga_sentence.length(), 0);
         if (bytes_sent != gpgga_sentence.length())
         {
             std::cerr << "Failed to send complete message to client." << std::endl;
@@ -134,4 +138,3 @@ bool Server::transmit_gnss(int client_socket)
     }
     return true;
 }
-
